@@ -1,0 +1,89 @@
+---
+title: "T shaped data skills"
+author: "Paul Williams"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# T shaped data skills
+
+TODO... write an explanation of what's going on and why
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo=TRUE,
+  warning=FALSE,
+  message=FALSE,
+  dev="svg"
+)
+```
+
+```{r install, results='hide'}
+install.packages("tidyverse")
+```
+
+### Skill set functions
+
+```{r skillset-functions, results='hide'}
+library(tibble)
+
+new_skill_set <- function() {
+  data <- tibble(
+    name = character(),  # Full name
+    label = character(), # Short name for the plot
+    level = integer(),   # Scale is your decision, just use integers for ease 
+  )
+  return (data)
+}
+
+add_skill <- function(skill_set, name, label, level) {
+  skill_set <- skill_set %>% add_row(name, label, level)
+  return (skill_set)
+}
+
+lock_ordering <- function(skill_set) {
+  skill_set$label <- factor(skill_set$label, levels = skill_set$label)
+  return (skill_set)
+}
+```
+
+### Minimalist themes
+
+```{r minimalist-theme, results='hide'}
+# TODO
+```
+
+### T-shape theme
+
+```{r t-shape-theme, results='hide'}
+# TODO
+```
+
+### Domains of expertise
+
+```{r domains-of-expertise}
+
+# The order is important!
+# Plotting is left to right from the top of the list.
+# We want deep skills in the middle and broad skills distributed equally at
+# the sides.
+skill_set <- new_skill_set() %>%
+  add_skill("Maths", "Maths", 1) %>%
+  add_skill("Economics", "Economics", 1) %>%
+  add_skill("Psychology", "Psychology", 1) %>%
+  add_skill("Data analytics", "Data", 3) %>%
+  add_skill("Software engineering", "Engineering", 6) %>%
+  add_skill("Leading teams", "Leadership", 3) %>%
+  add_skill("Graphic design", "Design", 1) %>%
+  add_skill("User research & User experience", "UR & UX", 1) %>%
+  lock_ordering()
+
+library(ggplot2)
+
+ggplot(skill_set) +
+  geom_col(aes(x=label, y=level)) + # Plot column chart
+  scale_y_reverse() +               # Flip upside down
+  scale_x_discrete(position="top")  # Move x-axis labels to top of graph
+
+# TODO: Style the bar chart, write a minimalist theme and then T shape theme
+```
