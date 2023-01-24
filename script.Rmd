@@ -5,9 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-# T shaped data skills
-
-TODO... write an explanation of what's going on and why
+# T-shape data skills
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -31,7 +29,7 @@ new_skill_set <- function() {
   data <- tibble(
     name = character(),  # Full name
     label = character(), # Short name for the plot
-    level = integer(),   # Scale is your decision, just use integers for ease 
+    level = integer(),   # Scale is your decision but use integers 
   )
   return (data)
 }
@@ -47,16 +45,49 @@ lock_ordering <- function(skill_set) {
 }
 ```
 
-### Minimalist themes
-
-```{r minimalist-theme, results='hide'}
-# TODO
-```
-
 ### T-shape theme
 
 ```{r t-shape-theme, results='hide'}
-# TODO
+t_shaped_theme <- function() {
+  theme(
+    panel.background = element_blank(),
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text.y = element_blank(),
+    legend.position = "none",
+  )
+}
+```
+
+### T-shape plot
+
+```{r t-shape-plot, results='hide'}
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+t_shaped_plot <- function(data) {
+  max_level <- max(data$level)
+  item_count <- nrow(data)
+  
+  data %>%
+    mutate(fills = rep(c(1:(item_count-1), "top"), 1)) %>%
+    ggplot(aes(x=label, y=level, fill=fills)) +
+    geom_col(position = position_stack()) +
+    scale_y_reverse() +
+    scale_x_discrete(position="top") +
+    scale_fill_manual(
+      values = seq_gradient_pal(
+        "lightblue", "darkblue", "Lab"
+      )(seq(0,1,length.out=item_count))
+      #values = c(
+        #colorRampPalette(colors = c("lightblue", "navy"))(max_level+1)
+      #)
+      # TODO: colour so that each bar is a gradient
+      # TODO: https://stackoverflow.com/questions/64016696/ggplot-bars-with-gradient-fill
+    ) +
+    t_shaped_theme()
+}
 ```
 
 ### Domains of expertise
@@ -67,23 +98,14 @@ lock_ordering <- function(skill_set) {
 # Plotting is left to right from the top of the list.
 # We want deep skills in the middle and broad skills distributed equally at
 # the sides.
-skill_set <- new_skill_set() %>%
-  add_skill("Maths", "Maths", 1) %>%
-  add_skill("Economics", "Economics", 1) %>%
-  add_skill("Psychology", "Psychology", 1) %>%
+new_skill_set() %>%
+  add_skill("Economics", "Econ", 1) %>%
+  add_skill("Psychology", "Psy", 1) %>%
   add_skill("Data analytics", "Data", 3) %>%
-  add_skill("Software engineering", "Engineering", 6) %>%
-  add_skill("Leading teams", "Leadership", 3) %>%
+  add_skill("Software engineering", "Engi", 6) %>%
+  add_skill("Leading teams", "Lead", 3) %>%
   add_skill("Graphic design", "Design", 1) %>%
   add_skill("User research & User experience", "UR & UX", 1) %>%
-  lock_ordering()
-
-library(ggplot2)
-
-ggplot(skill_set) +
-  geom_col(aes(x=label, y=level)) + # Plot column chart
-  scale_y_reverse() +               # Flip upside down
-  scale_x_discrete(position="top")  # Move x-axis labels to top of graph
-
-# TODO: Style the bar chart, write a minimalist theme and then T shape theme
+  lock_ordering() %>%
+  t_shaped_plot()
 ```
